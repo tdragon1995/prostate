@@ -500,7 +500,7 @@ function goTo(s) {
   if (s === 'bs') {
     document.getElementById('sc-bs').classList.add('active');
     renderStaff(STAFF);
-    renderPt(S.patients);
+    fetchAndRenderPatients();
   }
 }
 
@@ -639,6 +639,7 @@ async function completeBS() {
   const p = S.selPt;
 
   const record = {
+    "STT":                                p.no,
     "Mã Tham Gia":                        p.id,
     "Họ và Tên":                           p.name,
     "Ngày Sinh":                           p.dob ? new Date(p.dob).toLocaleDateString('vi-VN') : '',
