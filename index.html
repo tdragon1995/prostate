@@ -381,7 +381,7 @@ const S = {
 
 const STAFF = [
   {code:'BS001', first:'Bs. Bùi Nguyễn',  last:'Nguyên Anh', role:'Bác sĩ Nam Khoa'},
-  {code:'BS002', first:'Bs. Tô',          last:'Hoài',       role:'Bác sĩ Nam Khoa'},
+  {code:'BS002', first:'Bs. Tô Hoài',     last:'Tiến',       role:'Bác sĩ Nam Khoa'},
 ];
 
 const IPSS_Q = [
@@ -636,13 +636,13 @@ function renderPt(list) {
       <div style="flex:1">
         <div class="pt-name">${p.name}</div>
         <div class="pt-id">
-          ${p.dob ? `<strong>NS:</strong> ${p.dob}` : ''}
+          ${p.dob ? p.dob : ''}
           ${p.age ? `<strong>Tuổi:</strong> ${p.age}` : ''}
           <strong>IPSS:</strong> ${p.ipssTotal}/35
         </div>
       </div>
       <span class="status-badge ${p.status==='done'?'done':'pending'}">
-        ${p.status==='done'?'✓ Đã hoàn tất':'⧐ Chờ bác sĩ'}
+        ${p.status==='done'?'Đã hoàn tất':'Chờ bác sĩ'}
       </span>`;
     d.onclick = () => selPt(p);
     el.appendChild(d);
