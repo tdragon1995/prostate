@@ -94,7 +94,7 @@ h1{font-size:18px;font-weight:600;margin-bottom:.25rem}
     <div class="two">
       <div class="field">
         <label>Ngày tháng năm sinh <span style="color:red">*</span></label>
-        <input id="bn-dob" type="date" onchange="calcAge()">
+        <input id="bn-dob" type="text" placeholder="DD/MM/YYYY" onchange="calcAge()" oninput="formatDOB(this)">
       </div>
       <div class="field">
         <label>Tuổi</label>
@@ -432,11 +432,21 @@ function titleCase(input) {
   try { input.setSelectionRange(pos, pos); } catch(e){}
 }
 
+function formatDOB(input) {
+  let val = input.value.replace(/\D/g, '');
+  if (val.length > 8) val = val.slice(0, 8);
+  if (val.length >= 2) val = val.slice(0, 2) + '/' + val.slice(2);
+  if (val.length >= 5) val = val.slice(0, 5) + '/' + val.slice(5);
+  input.value = val;
+}
+
 function calcAge() {
-  const dob = document.getElementById('bn-dob').value;
+  const dobStr = document.getElementById('bn-dob').value;
   const ageInput = document.getElementById('bn-age');
-  if (!dob) { ageInput.value = ''; return; }
-  const birth = new Date(dob);
+  if (!dobStr || dobStr.length < 10) { ageInput.value = ''; return; }
+  const [day, month, year] = dobStr.split('/').map(Number);
+  if (!day || !month || !year) { ageInput.value = ''; return; }
+  const birth = new Date(year, month - 1, day);
   const today = new Date();
   let age = today.getFullYear() - birth.getFullYear();
   if (today.getMonth() < birth.getMonth() ||
@@ -533,11 +543,13 @@ async function submitBN() {
   const addr2 = addr2Raw || addr1;
   const ptId = document.getElementById('bn-id').value.trim();
 
+  const dobFormatted = dob; // Keep as DD/MM/YYYY from input
+
   const record = {
     "STT": S.runningNumber,
     "Mã Lượt Khám": ptId,
     "Họ và Tên": name,
-    "Ngày Sinh": dob,
+    "Ngày Sinh": dobFormatted,
     "Tuổi": parseInt(gv('bn-age')) || '',
     "Dân Tộc": eth,
     "Địa chỉ thường trú": addr1,
