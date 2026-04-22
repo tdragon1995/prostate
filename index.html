@@ -94,7 +94,21 @@ h1{font-size:18px;font-weight:600;margin-bottom:.25rem}
     <div class="two">
       <div class="field">
         <label>Ngày tháng năm sinh <span style="color:red">*</span></label>
-        <input id="bn-dob" type="date" onchange="calcAge()" max="">
+        <div style="position:relative">
+          <input id="bn-dob" type="text" placeholder="DD/MM/YYYY" maxlength="10" inputmode="numeric"
+                 oninput="formatDOB(this)" onchange="calcAge()"
+                 style="padding-right:38px">
+          <input id="bn-dob-picker" type="date" max=""
+                 style="position:absolute;right:0;top:0;width:36px;height:100%;opacity:0;cursor:pointer"
+                 onchange="syncDOBFromPicker()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"
+               style="position:absolute;right:10px;top:50%;transform:translateY(-50%);pointer-events:none">
+            <rect x="3" y="4" width="18" height="18" rx="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+        </div>
       </div>
       <div class="field">
         <label>Tuổi</label>
@@ -406,7 +420,7 @@ const IPSS_LABELS = [
 ];
 
 function init() {
-  document.getElementById('bn-dob').max = new Date().toISOString().split('T')[0];
+  document.getElementById('bn-dob-picker').max = new Date().toISOString().split('T')[0];
   buildIPSS();
   setupPills();
   renderStaff(STAFF);
@@ -432,17 +446,33 @@ function titleCase(input) {
   try { input.setSelectionRange(pos, pos); } catch(e){}
 }
 
-function dobToDDMMYYYY(isoDate) {
-  if (!isoDate) return '';
-  const [y, m, d] = isoDate.split('-');
-  return `${d}/${m}/${y}`;
+function formatDOB(input) {
+  let val = input.value.replace(/\D/g, '');
+  if (val.length > 8) val = val.slice(0, 8);
+  if (val.length >= 5) val = val.slice(0, 2) + '/' + val.slice(2, 4) + '/' + val.slice(4);
+  else if (val.length >= 3) val = val.slice(0, 2) + '/' + val.slice(2);
+  input.value = val;
+  if (val.length === 10) calcAge();
+}
+
+function syncDOBFromPicker() {
+  const picker = document.getElementById('bn-dob-picker');
+  const text = document.getElementById('bn-dob');
+  if (!picker.value) return;
+  const [y, m, d] = picker.value.split('-');
+  text.value = `${d}/${m}/${y}`;
+  calcAge();
 }
 
 function calcAge() {
-  const dob = document.getElementById('bn-dob').value;
+  const dobStr = document.getElementById('bn-dob').value;
   const ageInput = document.getElementById('bn-age');
-  if (!dob) { ageInput.value = ''; return; }
-  const birth = new Date(dob);
+  if (!dobStr || dobStr.length < 10) { ageInput.value = ''; return; }
+  const [day, month, year] = dobStr.split('/').map(Number);
+  if (!day || !month || !year || year < 1900 || month > 12 || day > 31) {
+    ageInput.value = ''; return;
+  }
+  const birth = new Date(year, month - 1, day);
   const today = new Date();
   let age = today.getFullYear() - birth.getFullYear();
   if (today.getMonth() < birth.getMonth() ||
@@ -525,7 +555,11 @@ async function submitBN() {
   const errEl = document.getElementById('bn-err');
 
   if (!name)  { errEl.style.display='block'; errEl.textContent='Vui lòng nhập họ và tên.'; return; }
-  if (!dob)   { errEl.style.display='block'; errEl.textContent='Vui lòng chọn ngày tháng năm sinh.'; return; }
+  if (!dob || !/^\d{2}\/\d{2}\/\d{4}$/.test(dob)) {
+    errEl.style.display='block';
+    errEl.textContent='Vui lòng nhập ngày sinh đúng định dạng DD/MM/YYYY.';
+    return;
+  }
   if (!eth)   { errEl.style.display='block'; errEl.textContent='Vui lòng nhập dân tộc.'; return; }
   if (!edu)   { errEl.style.display='block'; errEl.textContent='Vui lòng chọn trình độ học vấn.'; return; }
   if (!addr1) { errEl.style.display='block'; errEl.textContent='Vui lòng nhập địa chỉ thường trú.'; return; }
@@ -539,7 +573,7 @@ async function submitBN() {
   const addr2 = addr2Raw || addr1;
   const ptId = document.getElementById('bn-id').value.trim();
 
-  const dobFormatted = dobToDDMMYYYY(dob);
+  const dobFormatted = dob; // Already in DD/MM/YYYY from input
 
   const record = {
     "STT": S.runningNumber,
