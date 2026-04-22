@@ -85,9 +85,9 @@ h1{font-size:18px;font-weight:600;margin-bottom:.25rem}
         <input id="bn-name" placeholder="VD: Nguyễn Văn An" oninput="titleCase(this)">
       </div>
       <div class="field">
-        <label>Mã bệnh nhân <span style="color:red">*</span></label>
-        <input id="bn-id" placeholder="VD: P12345678">
-        <span style="font-size:12px;color:#bbb;margin-top:3px;display:block">Số BN bên phải tên trong Chi Tiết Thanh Toán (Bill)</span>
+        <label>Mã lượt khám <span style="color:red">*</span></label>
+        <input id="bn-id" placeholder="26000000000">
+        <span style="font-size:12px;color:#bbb;margin-top:3px;display:block">Mã vạch trên Chi Tiết Thanh Toán (Bill)</span>
       </div>
     </div>
 
@@ -169,26 +169,6 @@ h1{font-size:18px;font-weight:600;margin-bottom:.25rem}
     </div>
   </div>
 
-  <div class="card">
-    <div class="sec-title">3. Triệu chứng tiết niệu — Thang điểm IPSS</div>
-    <div id="ipss-wrap"></div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:.75rem;padding:.75rem;background:#f8f9fa;border-radius:8px">
-      <span style="font-size:13px;color:#555;font-weight:500">Tổng điểm IPSS</span>
-      <div>
-        <span style="font-size:24px;font-weight:700;color:#1a73e8" id="ipss-total">0</span>
-        <span style="font-size:12px;color:#888"> / 35</span>
-        <span style="font-size:12px;margin-left:8px;padding:2px 8px;border-radius:10px;font-weight:600" id="ipss-grade"></span>
-      </div>
-    </div>
-    <div class="two" style="margin-top:.75rem">
-      <div class="field"><label>Rối loạn cương dương?</label>
-        <div class="pills" id="pg-ed"><span class="pill" data-val="Có">Có</span><span class="pill" data-val="Không">Không</span></div>
-      </div>
-      <div class="field"><label>Đau vùng chậu / sinh dục?</label>
-        <div class="pills" id="pg-pain"><span class="pill" data-val="Có">Có</span><span class="pill" data-val="Không">Không</span></div>
-      </div>
-    </div>
-  </div>
 
   <div class="err-box" id="bn-err"></div>
   <button class="btn-main" id="btn-bn-submit" onclick="submitBN()">Gửi thông tin của tôi →</button>
@@ -250,6 +230,26 @@ h1{font-size:18px;font-weight:600;margin-bottom:.25rem}
           <span class="pill" data-val="Bất thường — mềm">Bất thường — mềm</span>
           <span class="pill" data-val="Bất thường — cứng/u">Bất thường — cứng/u</span>
           <span class="pill" data-val="Không thực hiện">Không thực hiện</span>
+        </div>
+      </div>
+      <div style="margin-top:1rem">
+        <div class="sec-title">3. Triệu chứng tiết niệu — Thang điểm IPSS</div>
+        <div id="ipss-wrap"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:.75rem;padding:.75rem;background:#f8f9fa;border-radius:8px">
+          <span style="font-size:13px;color:#555;font-weight:500">Tổng điểm IPSS</span>
+          <div>
+            <span style="font-size:24px;font-weight:700;color:#1a73e8" id="ipss-total">0</span>
+            <span style="font-size:12px;color:#888"> / 35</span>
+            <span style="font-size:12px;margin-left:8px;padding:2px 8px;border-radius:10px;font-weight:600" id="ipss-grade"></span>
+          </div>
+        </div>
+        <div class="two" style="margin-top:.75rem">
+          <div class="field"><label>Rối loạn cương dương?</label>
+            <div class="pills" id="pg-ed"><span class="pill" data-val="Có">Có</span><span class="pill" data-val="Không">Không</span></div>
+          </div>
+          <div class="field"><label>Đau vùng chậu / sinh dục?</label>
+            <div class="pills" id="pg-pain"><span class="pill" data-val="Có">Có</span><span class="pill" data-val="Không">Không</span></div>
+          </div>
         </div>
       </div>
       <!-- Theo dõi & Chỉ định -->
@@ -530,8 +530,6 @@ function submitBN() {
   const addr2Raw = document.getElementById('bn-addr2').value.trim();
   const addr2 = addr2Raw || addr1;
 
-  const ipssArr = [...S.ipssVals];
-
   S.patients.unshift({
     no: S.runningNumber,
     id: document.getElementById('bn-id').value.trim(),
@@ -547,10 +545,10 @@ function submitBN() {
     famCA:    pv('pg-fam-ca'),
     famOther: pv('pg-fam-other'),
     hist:     pv('pg-hist'),
-    ipss:     ipssArr,
-    ipssTotal: ipssArr.reduce((a, b) => a + b, 0),
-    ed:   pv('pg-ed'),
-    pain: pv('pg-pain'),
+    ipss:     [],
+    ipssTotal: 0,
+    ed:   '',
+    pain: '',
     status: 'pending',
   });
 
@@ -598,7 +596,7 @@ async function fetchAndRenderPatients() {
     if (json.status === 'ok' && json.rows && json.rows.length > 0) {
       S.patients = json.rows.map((row, idx) => ({
         no: row['STT'] || (idx + 1),
-        id: row['Mã Tham Gia'] || '',
+        id: row['Mã Lượt Khám'] || '',
         name: row['Họ và Tên'] || '',
         dob: row['Ngày Sinh'] || '',
         age: row['Tuổi'] || '',
@@ -656,6 +654,9 @@ function filterPt() {
 
 function selPt(p) {
   S.selPt = p;
+  S.ipssVals = [0,0,0,0,0,0,0];
+  buildIPSS();
+  calcIPSS();
   renderPt(S.patients);
   document.getElementById('bs-detail').style.display = 'block';
   renderSum(p);
@@ -687,7 +688,7 @@ async function completeBS() {
 
   const record = {
     "STT":                                p.no,
-    "Mã Tham Gia":                        p.id,
+    "Mã Lượt Khám":                       p.id,
     "Họ và Tên":                           p.name,
     "Ngày Sinh":                           p.dob || '',
     "Tuổi":                                p.age,
@@ -705,15 +706,15 @@ async function completeBS() {
     "Tăng huyết áp":                       (p.hist||'').includes('Tăng huyết áp')?'Có':'Không',
     "Rối loạn chuyển hóa":                 (p.hist||'').includes('Rối loạn chuyển hóa')?'Có':'Không',
     "Tiền sử dùng thuốc":                  p.meds,
-    "Tiểu đêm":                            p.ipss?.[6]??'',
-    "Dòng tiểu yếu":                       p.ipss?.[2]??'',
-    "Tiểu khó":                            p.ipss?.[5]??'',
-    "Tiểu nhỏ giọt":                       p.ipss?.[3]??'',
-    "Tiểu gấp":                            p.ipss?.[4]??'',
-    "Tiểu không hết":                      p.ipss?.[0]??'',
-    "Rối loạn cương":                      p.ed,
-    "Đau vùng chậu/sinh dục":              p.pain,
-    "Điểm IPSS":                           p.ipssTotal,
+    "Tiểu đêm":                            S.ipssVals[6],
+    "Dòng tiểu yếu":                       S.ipssVals[2],
+    "Tiểu khó":                            S.ipssVals[5],
+    "Tiểu nhỏ giọt":                       S.ipssVals[3],
+    "Tiểu gấp":                            S.ipssVals[4],
+    "Tiểu không hết":                      S.ipssVals[0],
+    "Rối loạn cương":                      pv('pg-ed'),
+    "Đau vùng chậu/sinh dục":              pv('pg-pain'),
+    "Điểm IPSS":                           S.ipssVals.reduce((a, b) => a + b, 0),
     "Nhận thức trước tầm soát":            pv('pg-aware'),
     "Lý do tham gia":                      pv('pg-reason'),
     "Mức độ e ngại":                       gv('bn-stigma'),
