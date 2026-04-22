@@ -19,11 +19,10 @@ h1{font-size:18px;font-weight:600;margin-bottom:.25rem}
 .field label{display:block;font-size:13px;color:#444;margin-bottom:3px;font-weight:500}
 .field input,.field select,.field textarea{width:100%;padding:8px 11px;border:1px solid #dadce0;border-radius:8px;font-size:14px;background:#fff;color:#1a1a2e;outline:none;transition:border-color .15s}
 .field input:focus,.field select:focus,.field textarea:focus{border-color:#1a73e8;box-shadow:0 0 0 3px rgba(26,115,232,.1)}
-.field input[readonly]{background:#f8f9fa;color:#1a1a2e;font-weight:600;border-color:#f0f0f0;cursor:default}
+.field input[readonly]{background:#f8f9fa;color:#888;cursor:default}
 .field textarea{min-height:60px;resize:vertical}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-@media(max-width:480px){.two{grid-template-columns:1fr}.three{grid-template-columns:1fr 1fr}}
 .pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
 .pill{padding:5px 13px;border:1px solid #dadce0;border-radius:20px;font-size:13px;cursor:pointer;color:#555;background:#fff;transition:all .12s;user-select:none}
 .pill:hover{border-color:#aaa}
@@ -36,6 +35,10 @@ h1{font-size:18px;font-weight:600;margin-bottom:.25rem}
 .ok-box p{color:#1e7e34;font-size:14px;margin-top:.4rem}
 .err-box{background:#fce8e6;border:1px solid #f5c6c2;border-radius:12px;padding:1rem;font-size:13px;color:#c5221f;margin-bottom:1rem;display:none}
 .screen{display:none}.screen.active{display:block}
+.tab-bar{display:flex;border-bottom:1px solid #e8eaed;margin-bottom:1.25rem;gap:0;overflow-x:auto}
+.tab{padding:8px 14px;font-size:13px;cursor:pointer;border:none;border-bottom:2px solid transparent;color:#666;background:none;white-space:nowrap;font-weight:500}
+.tab.on{color:#1a73e8;border-bottom-color:#1a73e8;font-weight:600}
+.tab-panel{display:none}.tab-panel.on{display:block}
 .pt-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid #e8eaed;border-radius:8px;cursor:pointer;margin-bottom:6px;transition:border-color .12s,background .12s}
 .pt-item:hover{border-color:#aaa;background:#fafafa}
 .pt-item.sel{border-color:#1a73e8;background:#e8f0fe}
@@ -46,21 +49,14 @@ h1{font-size:18px;font-weight:600;margin-bottom:.25rem}
 .dot-p{background:#fbbc04}.dot-d{background:#34a853}
 .sum-lbl{font-size:11px;color:#888;margin-bottom:2px;font-weight:500}
 .sum-val{font-size:13px;color:#1a1a2e;background:#f8f9fa;border-radius:7px;padding:6px 10px;margin-bottom:6px}
+.ipss-row{display:grid;grid-template-columns:2fr 80px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #f1f3f4}
+.ipss-row:last-child{border-bottom:none}
+.ipss-q{font-size:13px;color:#333}
 .loading{display:inline-block;width:16px;height:16px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px}
 @keyframes spin{to{transform:rotate(360deg)}}
+.info-box{background:#e8f0fe;border:1px solid #c5d8fb;border-radius:8px;padding:10px 12px;font-size:12px;color:#1a73e8;margin-bottom:1rem;display:flex;gap:8px;align-items:flex-start;line-height:1.5}
+.endpoint-input{font-size:12px;padding:6px 10px;border:1px solid #dadce0;border-radius:6px;width:100%;font-family:monospace;background:#f8f9fa;color:#333}
 .staff-sel-badge{display:none;background:#e6f4ea;border-radius:8px;padding:7px 10px;font-size:13px;color:#1e7e34;font-weight:500;margin-top:.5rem}
-/* IPSS table */
-.ipss-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:.75rem}
-.ipss-table{width:100%;border-collapse:collapse;font-size:12px;min-width:520px}
-.ipss-table th{background:#f8f9fa;color:#555;font-weight:600;font-size:11px;padding:7px 5px;text-align:center;border:1px solid #e8eaed;line-height:1.4}
-.ipss-table th:first-child{text-align:left;min-width:130px}
-.ipss-table td{padding:6px 4px;text-align:center;border:1px solid #f1f3f4;vertical-align:middle}
-.ipss-table td:first-child{text-align:left;font-size:12px;color:#333;padding-left:6px;line-height:1.4}
-.ipss-table tbody tr:nth-child(odd){background:#fafafa}
-.ipss-score{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;color:#888;border:1px solid #e8eaed;background:#fff;transition:all .12s}
-.ipss-score:hover{border-color:#aaa;background:#f5f5f5}
-.ipss-score.on{background:#1a73e8;color:#fff;border-color:#1a73e8}
-.ipss-score-hdr{font-weight:700;color:#1a73e8;font-size:13px}
 </style>
 </head>
 <body>
@@ -82,7 +78,7 @@ h1{font-size:18px;font-weight:600;margin-bottom:.25rem}
         <input id="bn-name" placeholder="VD: Nguyễn Văn An" oninput="titleCase(this)">
       </div>
       <div class="field">
-        <label>Mã bệnh nhân <span style="color:red">*</span></label>
+        <label>Mã bệnh nhân</label>
         <input id="bn-id" placeholder="VD: P12345678">
         <span style="font-size:12px;color:#bbb;margin-top:3px;display:block">Số BN bên phải tên trong Chi Tiết Thanh Toán (Bill)</span>
       </div>
@@ -95,17 +91,17 @@ h1{font-size:18px;font-weight:600;margin-bottom:.25rem}
       </div>
       <div class="field">
         <label>Tuổi</label>
-        <input id="bn-age" type="number" readonly>
+        <input id="bn-age" type="number" readonly style="background:#f8f9fa;color:#1a1a2e;font-weight:600;border-color:#f0f0f0">
       </div>
     </div>
 
     <div class="two">
       <div class="field">
-        <label>Dân Tộc <span style="color:red">*</span></label>
+        <label>Dân Tộc <span style="font-size:11px;color:#aaa;font-weight:400">(không bắt buộc)</span></label>
         <input id="bn-eth" placeholder="VD: Kinh, Hoa, Khmer...">
       </div>
       <div class="field">
-        <label>Trình độ học vấn <span style="color:red">*</span></label>
+        <label>Trình độ học vấn</label>
         <select id="bn-edu">
           <option value="">-- Chọn --</option>
           <option>Tiểu học</option>
@@ -119,17 +115,18 @@ h1{font-size:18px;font-weight:600;margin-bottom:.25rem}
     </div>
 
     <div class="field">
-      <label>Địa chỉ thường trú <span style="color:red">*</span></label>
+      <label>Địa chỉ thường trú</label>
       <input id="bn-addr1" placeholder="Số nhà, đường, quận/huyện, tỉnh/thành">
     </div>
 
     <div class="field">
       <label>Địa chỉ tạm trú</label>
-      <input id="bn-addr2" placeholder="Để trống nếu giống địa chỉ thường trú">
+      <input id="bn-addr2">
+      <span style="font-size:12px;color:#bbb;margin-top:3px;display:block">Để trống nếu giống địa chỉ thường trú</span>
     </div>
 
     <div class="field">
-      <label>Nghề nghiệp <span style="color:red">*</span></label>
+      <label>Nghề nghiệp</label>
       <input id="bn-job" placeholder="VD: Công nhân, Giáo viên, Kinh doanh...">
     </div>
   </div>
@@ -150,8 +147,7 @@ h1{font-size:18px;font-weight:600;margin-bottom:.25rem}
         <span class="pill" data-val="Không rõ">Không rõ</span>
       </div>
     </div>
-    <div class="field">
-      <label>Tiền sử bản thân <span style="font-size:11px;color:#aaa;font-weight:400">(để trống nếu không có)</span></label>
+    <div class="field"><label>Tiền sử bản thân (chọn tất cả phù hợp)</label>
       <div class="pills" id="pg-hist" data-multi="1">
         <span class="pill" data-val="Phì đại tuyến tiền liệt">Phì đại tuyến tiền liệt</span>
         <span class="pill" data-val="Viêm tuyến tiền liệt">Viêm tuyến tiền liệt</span>
@@ -161,13 +157,14 @@ h1{font-size:18px;font-weight:600;margin-bottom:.25rem}
         <span class="pill" data-val="Rối loạn chuyển hóa">Rối loạn chuyển hóa</span>
       </div>
     </div>
-    <div class="field"><label>Tiền sử dùng thuốc <span style="font-size:11px;color:#aaa;font-weight:400">(để trống nếu không có)</span></label>
+    <div class="field"><label>Tiền sử dùng thuốc (liệt kê nếu có)</label>
       <textarea id="bn-meds" placeholder="VD: Finasteride 5mg, Tamsulosin 0.4mg..."></textarea>
     </div>
   </div>
 
   <div class="card">
     <div class="sec-title">3. Triệu chứng tiết niệu — Thang điểm IPSS</div>
+    <p style="font-size:12px;color:#888;margin-bottom:.75rem">Điền số lần / mức độ (0 = không bao giờ, 5 = hầu như luôn luôn)</p>
     <div id="ipss-wrap"></div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:.75rem;padding:.75rem;background:#f8f9fa;border-radius:8px">
       <span style="font-size:13px;color:#555;font-weight:500">Tổng điểm IPSS</span>
@@ -205,7 +202,7 @@ h1{font-size:18px;font-weight:600;margin-bottom:.25rem}
 <!-- ═══════════════════════════════════════════════════════════ -->
 <div id="sc-bs" class="screen">
 
-  <div id="gs-endpoint" style="display:none">https://script.google.com/macros/s/AKfycbx1xh8qFBJDjL3LNMaUZihvH_EMdDnZieVyxUydLh58VbE5VUU9NKLm2xNUpcanksMj/exec</div>
+  <div id="gs-endpoint" style="display:none">https://script.google.com/macros/s/AKfycbynTf7r-iUSYQrotUDTguZ2SWiMwOiGgngOGU5Y0g27MCKIZpI4vUTwUjCGRxGQzr-U/exec</div>
 
   <div class="card">
     <div class="sec-title">Nhân viên thực hiện</div>
@@ -226,108 +223,115 @@ h1{font-size:18px;font-weight:600;margin-bottom:.25rem}
 
   <div id="bs-detail" style="display:none">
     <div class="card">
-
-      <!-- Patient summary -->
-      <div class="sec-title">Tóm tắt bệnh nhân</div>
-      <div id="sum-content" style="margin-bottom:1.25rem"></div>
-
-      <!-- Xét nghiệm & Lâm sàng -->
-      <div class="sec-title" style="margin-top:1rem">Xét nghiệm &amp; Lâm sàng</div>
-      <div class="two">
-        <div class="field"><label>Thể tích tuyến tiền liệt (mL)</label>
-          <input id="d-vol" type="number" step="0.1" placeholder="Nếu có siêu âm">
-        </div>
-        <div class="field"><label>Mật độ PSA</label>
-          <input id="d-den" type="number" step="0.001" placeholder="VD: 0.15">
-        </div>
-      </div>
-      <div class="field"><label>Kết quả thăm trực tràng (DRE)</label>
-        <div class="pills" id="pg-dre">
-          <span class="pill" data-val="Bình thường">Bình thường</span>
-          <span class="pill" data-val="Bất thường — mềm">Bất thường — mềm</span>
-          <span class="pill" data-val="Bất thường — cứng/u">Bất thường — cứng/u</span>
-          <span class="pill" data-val="Không thực hiện">Không thực hiện</span>
-        </div>
-      </div>
-      <div class="field"><label>PSA cao (≥ 4 ng/mL)?</label>
-        <div class="pills" id="pg-epsa">
-          <span class="pill" data-val="Có">Có</span>
-          <span class="pill" data-val="Không">Không</span>
-        </div>
+      <div class="tab-bar">
+        <button class="tab on" onclick="swTab('sum',this)">Tóm tắt bệnh nhân</button>
+        <button class="tab" onclick="swTab('xn',this)">Xét nghiệm &amp; Lâm sàng</button>
+        <button class="tab" onclick="swTab('td',this)">Theo dõi &amp; Chỉ định</button>
+        <button class="tab" onclick="swTab('hv',this)">Hành vi &amp; Nhận thức</button>
       </div>
 
-      <!-- Theo dõi & Chỉ định -->
-      <div class="sec-title" style="margin-top:1rem">Theo dõi &amp; Chỉ định</div>
-      <div class="field"><label>Có chuyển tuyến không?</label>
-        <div class="pills" id="pg-ref">
-          <span class="pill" data-val="Có">Có</span>
-          <span class="pill" data-val="Không">Không</span>
-        </div>
-      </div>
-      <div class="field"><label>Chuyên khoa chuyển (nếu có)</label>
-        <div class="pills" id="pg-refsp" data-multi="1">
-          <span class="pill" data-val="Tiết niệu">Tiết niệu</span>
-          <span class="pill" data-val="Ung bướu">Ung bướu</span>
-          <span class="pill" data-val="Ngoại khoa">Ngoại khoa</span>
-          <span class="pill" data-val="Nội khoa">Nội khoa</span>
-        </div>
-      </div>
-      <div class="field"><label>Có sinh thiết không?</label>
-        <div class="pills" id="pg-bx">
-          <span class="pill" data-val="Có">Có</span>
-          <span class="pill" data-val="Không">Không</span>
-        </div>
-      </div>
-      <div class="field"><label>Kết quả sinh thiết</label>
-        <div class="pills" id="pg-bxr">
-          <span class="pill" data-val="Lành tính">Lành tính</span>
-          <span class="pill" data-val="PIN độ thấp">PIN độ thấp</span>
-          <span class="pill" data-val="PIN độ cao">PIN độ cao</span>
-          <span class="pill" data-val="Ung thư">Ung thư</span>
-        </div>
-      </div>
-      <div class="two">
-        <div class="field"><label>Điểm Gleason (nếu ung thư)</label>
-          <input id="d-gl" type="number" min="2" max="10" placeholder="VD: 7">
-        </div>
-        <div class="field"><label>Số mẫu dương tính / tổng</label>
-          <input id="d-cores" placeholder="VD: 3/12">
-        </div>
-      </div>
-      <div class="field"><label>Kết quả hình ảnh (MRI / CT / X-quang xương)</label>
-        <textarea id="d-img" placeholder="Mô tả kết quả hoặc ghi 'Không thực hiện'..."></textarea>
+      <!-- Tab: Tom tat -->
+      <div id="tab-sum" class="tab-panel on">
+        <div id="sum-content"></div>
       </div>
 
-      <!-- Hành vi & Nhận thức -->
-      <div class="sec-title" style="margin-top:1rem">Hành vi &amp; Nhận thức</div>
-      <div class="field"><label>Đã biết về tầm soát ung thư tuyến tiền liệt trước hôm nay?</label>
-        <div class="pills" id="pg-aware">
-          <span class="pill" data-val="Có">Có</span>
-          <span class="pill" data-val="Không">Không</span>
+      <!-- Tab: Xet nghiem & Lam sang -->
+      <div id="tab-xn" class="tab-panel">
+        <div class="sec-title">Xét nghiệm &amp; Lâm sàng</div>
+        <div class="two">
+          <div class="field"><label>Thể tích tuyến tiền liệt (mL)</label>
+            <input id="d-vol" type="number" step="0.1" placeholder="Nếu có siêu âm">
+          </div>
+          <div class="field"><label>Mật độ PSA</label>
+            <input id="d-den" type="number" step="0.001" placeholder="VD: 0.15">
+          </div>
+        </div>
+        <div class="field"><label>Kết quả thăm trực tràng (DRE)</label>
+          <div class="pills" id="pg-dre">
+            <span class="pill" data-val="Bình thường">Bình thường</span>
+            <span class="pill" data-val="Bất thường — mềm">Bất thường — mềm</span>
+            <span class="pill" data-val="Bất thường — cứng/u">Bất thường — cứng/u</span>
+            <span class="pill" data-val="Không thực hiện">Không thực hiện</span>
+          </div>
         </div>
       </div>
-      <div class="field"><label>Lý do tham gia tầm soát (có thể chọn nhiều)</label>
-        <div class="pills" id="pg-reason" data-multi="1">
-          <span class="pill" data-val="Gia đình khuyến khích">Gia đình khuyến khích</span>
-          <span class="pill" data-val="Bác sĩ giới thiệu">Bác sĩ giới thiệu</span>
-          <span class="pill" data-val="Cộng đồng / truyền thông">Cộng đồng / truyền thông</span>
-          <span class="pill" data-val="Tự tìm hiểu">Tự tìm hiểu</span>
+
+      <!-- Tab: Theo doi & Chi dinh -->
+      <div id="tab-td" class="tab-panel">
+        <div class="sec-title">Theo dõi &amp; Chỉ định</div>
+        <div class="field"><label>Có chuyển tuyến không?</label>
+          <div class="pills" id="pg-ref">
+            <span class="pill" data-val="Có">Có</span>
+            <span class="pill" data-val="Không">Không</span>
+          </div>
+        </div>
+        <div class="field"><label>Chuyên khoa chuyển (nếu có)</label>
+          <div class="pills" id="pg-refsp" data-multi="1">
+            <span class="pill" data-val="Tiết niệu">Tiết niệu</span>
+            <span class="pill" data-val="Ung bướu">Ung bướu</span>
+            <span class="pill" data-val="Ngoại khoa">Ngoại khoa</span>
+            <span class="pill" data-val="Nội khoa">Nội khoa</span>
+          </div>
+        </div>
+        <div class="field"><label>Có sinh thiết không?</label>
+          <div class="pills" id="pg-bx">
+            <span class="pill" data-val="Có">Có</span>
+            <span class="pill" data-val="Không">Không</span>
+          </div>
+        </div>
+        <div class="field"><label>Kết quả sinh thiết</label>
+          <div class="pills" id="pg-bxr">
+            <span class="pill" data-val="Lành tính">Lành tính</span>
+            <span class="pill" data-val="PIN độ thấp">PIN độ thấp</span>
+            <span class="pill" data-val="PIN độ cao">PIN độ cao</span>
+            <span class="pill" data-val="Ung thư">Ung thư</span>
+          </div>
+        </div>
+        <div class="two">
+          <div class="field"><label>Điểm Gleason (nếu ung thư)</label>
+            <input id="d-gl" type="number" min="2" max="10" placeholder="VD: 7">
+          </div>
+          <div class="field"><label>Số mẫu dương tính / tổng</label>
+            <input id="d-cores" placeholder="VD: 3/12">
+          </div>
+        </div>
+        <div class="field"><label>Kết quả hình ảnh (MRI / CT / X-quang xương)</label>
+          <textarea id="d-img" placeholder="Mô tả kết quả hoặc ghi 'Không thực hiện'..."></textarea>
         </div>
       </div>
-      <div class="two">
-        <div class="field">
-          <label>Mức độ e ngại (1 = ít, 5 = rất ngại)</label>
-          <select id="bn-stigma">
-            <option value="">-- Chọn --</option>
-            <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
-          </select>
+
+      <!-- Tab: Hanh vi & Nhan thuc -->
+      <div id="tab-hv" class="tab-panel">
+        <div class="sec-title">Hành vi &amp; Nhận thức</div>
+        <div class="field"><label>Đã biết về tầm soát ung thư tuyến tiền liệt trước hôm nay?</label>
+          <div class="pills" id="pg-aware">
+            <span class="pill" data-val="Có">Có</span>
+            <span class="pill" data-val="Không">Không</span>
+          </div>
         </div>
-        <div class="field">
-          <label>Mức độ thoải mái (1–5)</label>
-          <select id="bn-comfort">
-            <option value="">-- Chọn --</option>
-            <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
-          </select>
+        <div class="field"><label>Lý do tham gia tầm soát (có thể chọn nhiều)</label>
+          <div class="pills" id="pg-reason" data-multi="1">
+            <span class="pill" data-val="Gia đình khuyến khích">Gia đình khuyến khích</span>
+            <span class="pill" data-val="Bác sĩ giới thiệu">Bác sĩ giới thiệu</span>
+            <span class="pill" data-val="Cộng đồng / truyền thông">Cộng đồng / truyền thông</span>
+            <span class="pill" data-val="Tự tìm hiểu">Tự tìm hiểu</span>
+          </div>
+        </div>
+        <div class="two">
+          <div class="field">
+            <label>Mức độ e ngại (1 = ít, 5 = rất ngại)</label>
+            <select id="bn-stigma">
+              <option value="">-- Chọn --</option>
+              <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Mức độ thoải mái (1–5)</label>
+            <select id="bn-comfort">
+              <option value="">-- Chọn --</option>
+              <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -351,6 +355,7 @@ h1{font-size:18px;font-weight:600;margin-bottom:.25rem}
     <button onclick="closePwModal()" style="width:100%;padding:9px;border:1px solid #dadce0;border-radius:8px;background:#fff;color:#666;font-size:14px;cursor:pointer;margin-top:.5rem">Huỷ</button>
   </div>
 </div>
+
 
 <div id="sc-bs-done" class="screen">
   <div class="ok-box">
@@ -380,35 +385,22 @@ const S = {
   selStaff: null,
   pills: {},
   runningNumber: 0,
-  ipssVals: [0,0,0,0,0,0,0],
 };
 
+// ── Edit staff list here ──────────────────────────────────────
 const STAFF = [
-  {code:'BS001', first:'Nguyễn', last:'Văn Minh',  role:'Bác sĩ tiết niệu'},
-  {code:'BS002', first:'Trần',   last:'Thị Lan',   role:'Bác sĩ nội khoa'},
-  {code:'BS003', first:'Lê',     last:'Quốc Hùng', role:'Bác sĩ ung bướu'},
-  {code:'ĐD001', first:'Phạm',   last:'Thị Hoa',   role:'Điều dưỡng'},
-  {code:'ĐD002', first:'Võ',     last:'Thành Nam',  role:'Điều dưỡng'},
-  {code:'KTV001',first:'Hoàng',  last:'Minh Tuấn',  role:'Kỹ thuật viên'},
+  {code:'BS001', first:'Bùi Nguyễn',  last:'Nguyên Anh', role:'Bác sĩ Nam Khoa'},
+  {code:'BS002', first:'Tô',          last:'Hoài',       role:'Bác sĩ Nam Khoa'},
 ];
 
-const IPSS_Q = [
-  'Cảm giác chưa đi hết sau khi đi tiểu',
-  'Đi tiểu lại trong vòng 2 giờ sau khi đã đi tiểu',
-  'Dòng nước tiểu yếu hoặc chậm',
-  'Nước tiểu bị gián đoạn và ngắt quãng',
-  'Khó nín tiểu',
-  'Rặn mới tiểu được',
-  'Tiểu đêm',
-];
-
-const IPSS_LABELS = [
-  'Không có\nlần nào',
-  'Có ít hơn\n⅓ số lần',
-  'Có ít hơn\n½ số lần',
-  'Khoảng\n½ số lần',
-  'Có hơn\n½ số lần',
-  'Thường\nxuyên',
+const IPSS = [
+  'Tiểu không hết bàng quang',
+  'Tiểu nhiều lần trong 2 giờ',
+  'Dòng tiểu ngắt quãng',
+  'Tiểu gấp không nhịn được',
+  'Dòng tiểu yếu',
+  'Tiểu khó / phải rặn',
+  'Tiểu đêm (số lần)',
 ];
 
 function init() {
@@ -417,27 +409,28 @@ function init() {
   setupPills();
   renderStaff(STAFF);
   S.runningNumber = parseInt(localStorage.getItem('prostate_running_no') || '0');
+  // Demo patients
   S.patients = [
-    {no:1,id:'',name:'Nguyễn Văn An',dob:'1966-03-15',age:58,eth:'Kinh',
+    {no:1,id:'',name:'Nguyễn Văn An',dob:'1966-03-15',age:58,eth:'Phật giáo',
      edu:'THPT',addr1:'123 Lê Lợi, Q1, TP.HCM',addr2:'',job:'Công nhân',
-     meds:'Tamsulosin 0.4mg',famCA:'Có',famOther:'Không',
-     hist:'Phì đại tuyến tiền liệt',
+     meds:'Tamsulosin 0.4mg',famCA:'Có',famOther:'Không',hist:'Phì đại TTL',
      ipss:[2,1,1,2,2,1,2],ipssTotal:11,ed:'Có',pain:'Không',status:'pending'},
-    {no:2,id:'TS-001',name:'Trần Minh Tuấn',dob:'1961-07-24',age:63,eth:'Kinh',
+    {no:2,id:'TS-001',name:'Trần Minh Tuấn',dob:'1961-07-24',age:63,eth:'',
      edu:'Đại học',addr1:'45 Nguyễn Huệ, Q3, TP.HCM',addr2:'',job:'Giáo viên',
      meds:'',famCA:'Không',famOther:'Không',hist:'',
      ipss:[1,1,0,1,1,1,1],ipssTotal:6,ed:'Không',pain:'Không',status:'done'},
   ];
   if (S.runningNumber === 0) S.runningNumber = 2;
-  calcIPSS();
 }
 
+// Auto capitalize each word
 function titleCase(input) {
   const pos = input.selectionStart;
   input.value = input.value.replace(/(?:^|\s)\S/g, c => c.toUpperCase());
   try { input.setSelectionRange(pos, pos); } catch(e){}
 }
 
+// Calculate age from DoB
 function calcAge() {
   const dob = document.getElementById('bn-dob').value;
   const ageInput = document.getElementById('bn-age');
@@ -452,36 +445,22 @@ function calcAge() {
 
 function buildIPSS() {
   const w = document.getElementById('ipss-wrap');
-  let html = '<div class="ipss-wrap"><table class="ipss-table"><thead><tr>';
-  html += '<th>Số lần trong tháng</th>';
-  IPSS_LABELS.forEach((l,i) => {
-    html += `<th>${l.replace('\n','<br>')}<br><span class="ipss-score-hdr">${i}</span></th>`;
+  w.innerHTML = '';
+  IPSS.forEach((q, i) => {
+    const row = document.createElement('div');
+    row.className = 'ipss-row';
+    row.innerHTML = `<span class="ipss-q">${q}</span>
+      <input type="number" min="0" max="5" value="0" id="ipss-${i}"
+        style="text-align:center;padding:6px" onchange="calcIPSS()">`;
+    w.appendChild(row);
   });
-  html += '</tr></thead><tbody>';
-  IPSS_Q.forEach((q,qi) => {
-    html += `<tr><td>${q}</td>`;
-    for (let n = 0; n < 6; n++) {
-      const on = S.ipssVals[qi] === n ? ' on' : '';
-      html += `<td><span class="ipss-score${on}" onclick="setIPSS(${qi},${n})">${n}</span></td>`;
-    }
-    html += '</tr>';
-  });
-  html += '</tbody></table></div>';
-  w.innerHTML = html;
-}
-
-function setIPSS(qi, val) {
-  S.ipssVals[qi] = val;
-  buildIPSS();
-  calcIPSS();
 }
 
 function calcIPSS() {
-  const t = S.ipssVals.reduce((a, b) => a + b, 0);
-  const el = document.getElementById('ipss-total');
-  const g  = document.getElementById('ipss-grade');
-  if (!el) return;
-  el.textContent = t;
+  let t = 0;
+  for (let i = 0; i < IPSS.length; i++) t += parseInt(document.getElementById('ipss-'+i).value || 0);
+  document.getElementById('ipss-total').textContent = t;
+  const g = document.getElementById('ipss-grade');
   if (t <= 7)       { g.textContent='Nhẹ';  g.style.cssText='background:#e6f4ea;color:#1e7e34'; }
   else if (t <= 19) { g.textContent='Vừa';  g.style.cssText='background:#fff3e0;color:#e65100'; }
   else              { g.textContent='Nặng'; g.style.cssText='background:#fce8e6;color:#c5221f'; }
@@ -511,34 +490,26 @@ function goTo(s) {
   if (s === 'bs') {
     document.getElementById('sc-bs').classList.add('active');
     renderStaff(STAFF);
-    renderPt(S.patients);
+    fetchAndRenderPatients(); // Load from Google Sheets
   }
 }
 
 function submitBN() {
-  const name  = document.getElementById('bn-name').value.trim();
-  const dob   = document.getElementById('bn-dob').value;
-  const eth   = document.getElementById('bn-eth').value.trim();
-  const edu   = gv('bn-edu');
-  const addr1 = document.getElementById('bn-addr1').value.trim();
-  const job   = document.getElementById('bn-job').value.trim();
+  const name = document.getElementById('bn-name').value.trim();
+  const dob  = document.getElementById('bn-dob').value;
   const errEl = document.getElementById('bn-err');
-
-  if (!name)  { errEl.style.display='block'; errEl.textContent='Vui lòng nhập họ và tên.'; return; }
-  if (!dob)   { errEl.style.display='block'; errEl.textContent='Vui lòng chọn ngày tháng năm sinh.'; return; }
-  if (!eth)   { errEl.style.display='block'; errEl.textContent='Vui lòng nhập dân tộc.'; return; }
-  if (!edu)   { errEl.style.display='block'; errEl.textContent='Vui lòng chọn trình độ học vấn.'; return; }
-  if (!addr1) { errEl.style.display='block'; errEl.textContent='Vui lòng nhập địa chỉ thường trú.'; return; }
-  if (!job)   { errEl.style.display='block'; errEl.textContent='Vui lòng nhập nghề nghiệp.'; return; }
+  if (!name) { errEl.style.display='block'; errEl.textContent='Vui lòng nhập họ và tên.'; return; }
+  if (!dob)  { errEl.style.display='block'; errEl.textContent='Vui lòng chọn ngày tháng năm sinh.'; return; }
   errEl.style.display = 'none';
 
   S.runningNumber++;
   localStorage.setItem('prostate_running_no', S.runningNumber);
 
+  const addr1 = document.getElementById('bn-addr1').value.trim();
   const addr2Raw = document.getElementById('bn-addr2').value.trim();
-  const addr2 = addr2Raw || addr1;
+  const addr2 = addr2Raw || addr1; // auto-copy if blank
 
-  const ipssArr = [...S.ipssVals];
+  const ipssArr = IPSS.map((_, i) => parseInt(document.getElementById('ipss-'+i).value || 0));
 
   S.patients.unshift({
     no: S.runningNumber,
@@ -546,11 +517,11 @@ function submitBN() {
     name,
     dob,
     age: parseInt(gv('bn-age')) || '',
-    eth,
-    edu,
+    eth: document.getElementById('bn-eth').value.trim(),
+    edu: gv('bn-edu'),
     addr1,
     addr2,
-    job,
+    job: document.getElementById('bn-job').value.trim(),
     meds: gv('bn-meds'),
     famCA:    pv('pg-fam-ca'),
     famOther: pv('pg-fam-other'),
@@ -618,11 +589,56 @@ function filterPt() {
   renderPt(S.patients.filter(p => (p.name+(p.id||'')).toLowerCase().includes(q)));
 }
 
+async function fetchAndRenderPatients() {
+  const endpoint = document.getElementById('gs-endpoint').textContent.trim();
+  
+  if (!endpoint) {
+    renderPt(S.patients); // Fallback to local demo data
+    return;
+  }
+  
+  try {
+    // Construct proper GET URL: replace /exec with ?action=fetchData
+    const url = endpoint + '?action=fetchData';
+    const res = await fetch(url);
+    const json = await res.json();
+    
+    if (json.status === 'ok' && json.rows && json.rows.length > 0) {
+      // Convert sheet rows to patient objects
+      S.patients = json.rows.map((row, idx) => ({
+        no: row['STT'] || (idx + 1),
+        id: row['Mã Tham Gia'] || '',
+        name: row['Họ và Tên'] || '',
+        dob: row['Ngày Sinh'] || '',
+        age: row['Tuổi'] || '',
+        eth: row['Dân Tộc'] || '',
+        edu: row['Trình độ học vấn'] || '',
+        addr1: row['Địa chỉ thường trú'] || '',
+        addr2: row['Địa chỉ tạm trú'] || '',
+        job: row['Nghề nghiệp'] || '',
+        meds: row['Tiền sử dùng thuốc'] || '',
+        famCA: row['Tiền sử gia đình UTTTL'] || '',
+        famOther: row['Tiền sử gia đình ung thư khác'] || '',
+        hist: row['Tiền sử bản thân'] || '',
+        ipssTotal: row['Điểm IPSS'] || 0,
+        ed: row['Rối loạn cương'] || '',
+        pain: row['Đau vùng chậu/sinh dục'] || '',
+        status: row['Nhân sự thực hiện'] ? 'done' : 'pending',
+      }));
+    }
+    renderPt(S.patients);
+  } catch (err) {
+    console.error('Lỗi khi tải dữ liệu:', err);
+    renderPt(S.patients); // Fallback to demo data on error
+  }
+}
+
 function selPt(p) {
   S.selPt = p;
   renderPt(S.patients);
   document.getElementById('bs-detail').style.display = 'block';
   renderSum(p);
+  swTab('sum', document.querySelectorAll('.tab')[0]);
 }
 
 function renderSum(p) {
@@ -631,16 +647,23 @@ function renderSum(p) {
   document.getElementById('sum-content').innerHTML = `
     <div class="two">${f('Họ và tên',p.name)}${f('Mã bệnh nhân',p.id)}</div>
     <div class="two">${f('Ngày sinh',dobFmt)}${f('Tuổi',p.age ? p.age+' tuổi' : '')}</div>
-    <div class="two">${f('Dân tộc',p.eth)}${f('Trình độ học vấn',p.edu)}</div>
+    <div class="two">${f('Tôn giáo',p.eth)}${f('Trình độ học vấn',p.edu)}</div>
     ${f('Nghề nghiệp',p.job)}
     ${f('Địa chỉ thường trú',p.addr1)}
     ${(p.addr2 && p.addr2!==p.addr1) ? f('Địa chỉ tạm trú',p.addr2) : ''}
-    <div class="two">${f('Tiền sử Gia Đình — Ung Thư Tuyến Tiền Liệt',p.famCA)}${f('Tiền sử Gia Đình — Ung Thư Khác',p.famOther)}</div>
+    <div class="two">${f('Tiền sử GĐ — UTTTL',p.famCA)}${f('Tiền sử GĐ — ung thư khác',p.famOther)}</div>
     ${f('Tiền sử bản thân',p.hist)}
     ${f('Thuốc đang dùng',p.meds)}
     ${f('Tổng điểm IPSS',p.ipssTotal+'/35')}
     <div class="two">${f('Rối loạn cương',p.ed)}${f('Đau vùng chậu',p.pain)}</div>
   `;
+}
+
+function swTab(id, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  document.querySelectorAll('.tab-panel').forEach(t => t.classList.remove('on'));
+  if (btn) btn.classList.add('on');
+  document.getElementById('tab-'+id).classList.add('on');
 }
 
 async function completeBS() {
@@ -650,49 +673,49 @@ async function completeBS() {
   const p = S.selPt;
 
   const record = {
-    "Mã Tham Gia":                        p.id,
-    "Họ và Tên":                           p.name,
-    "Ngày Sinh":                           p.dob ? new Date(p.dob).toLocaleDateString('vi-VN') : '',
-    "Tuổi":                                p.age,
-    "Dân Tộc":                             p.eth,
-    "Địa chỉ thường trú":                  p.addr1,
-    "Địa chỉ tạm trú":                     p.addr2,
-    "Trình độ học vấn":                    p.edu,
-    "Nghề nghiệp":                         p.job,
-    "Tiền sử gia đình UTTTL":              p.famCA,
-    "Tiền sử gia đình ung thư khác":       p.famOther,
-    "Tiền sử phì đại tuyến tiền liệt":     (p.hist||'').includes('Phì đại tuyến tiền liệt')?'Có':'Không',
-    "Tiền sử viêm tuyến tiền liệt":        (p.hist||'').includes('Viêm tuyến tiền liệt')?'Có':'Không',
-    "Tiền sử nhiễm trùng tiểu":            (p.hist||'').includes('Nhiễm trùng tiểu')?'Có':'Không',
-    "Đái tháo đường":                      (p.hist||'').includes('Đái tháo đường')?'Có':'Không',
-    "Tăng huyết áp":                       (p.hist||'').includes('Tăng huyết áp')?'Có':'Không',
-    "Rối loạn chuyển hóa":                 (p.hist||'').includes('Rối loạn chuyển hóa')?'Có':'Không',
-    "Tiền sử dùng thuốc":                  p.meds,
-    "Tiểu đêm":                            p.ipss?.[6]??'',
-    "Dòng tiểu yếu":                       p.ipss?.[2]??'',
-    "Tiểu khó":                            p.ipss?.[5]??'',
-    "Tiểu nhỏ giọt":                       p.ipss?.[3]??'',
-    "Tiểu gấp":                            p.ipss?.[4]??'',
-    "Tiểu không hết":                      p.ipss?.[0]??'',
-    "Rối loạn cương":                      p.ed,
-    "Đau vùng chậu/sinh dục":              p.pain,
-    "Điểm IPSS":                           p.ipssTotal,
-    "Nhận thức trước tầm soát":            pv('pg-aware'),
-    "Lý do tham gia":                      pv('pg-reason'),
-    "Mức độ e ngại":                       gv('bn-stigma'),
-    "Mức độ thoải mái":                    gv('bn-comfort'),
-    "Thể tích tuyến tiền liệt":            gv('d-vol'),
-    "Mật độ PSA":                          gv('d-den'),
-    "Kết quả thăm trực tràng":             pv('pg-dre'),
-    "PSA cao":                             pv('pg-epsa'),
-    "Có chuyển tuyến không":               pv('pg-ref'),
-    "Chuyên khoa chuyển":                  pv('pg-refsp'),
-    "Có sinh thiết không":                 pv('pg-bx'),
-    "Kết quả sinh thiết":                  pv('pg-bxr'),
-    "Điểm Gleason":                        gv('d-gl'),
-    "Số mẫu dương tính":                   gv('d-cores'),
-    "Kết quả hình ảnh":                    gv('d-img'),
-    "Nhân sự thực hiện":                   S.selStaff ? S.selStaff.code+' — '+S.selStaff.first+' '+S.selStaff.last : '',
+    "STT":                           p.no,
+    "Mã Bệnh Nhân":                  p.id,
+    "Họ và Tên":                     p.name,
+    "Ngày Sinh":                     p.dob ? new Date(p.dob).toLocaleDateString('vi-VN') : '',
+    "Tuổi":                          p.age,
+    "Tôn giáo":                      p.eth,
+    "Địa chỉ thường trú":            p.addr1,
+    "Địa chỉ tạm trú":               p.addr2,
+    "Trình độ học vấn":              p.edu,
+    "Nghề nghiệp":                   p.job,
+    "Tiền sử gia đình UTTTL":        p.famCA,
+    "Tiền sử gia đình ung thư khác": p.famOther,
+    "Tiền sử phì đại tuyến tiền liệt":  (p.hist||'').includes('Phì đại tuyến tiền liệt')?'Có':'Không',
+    "Tiền sử viêm tuyến tiền liệt":      (p.hist||'').includes('Viêm tuyến tiền liệt')?'Có':'Không',
+    "Tiền sử nhiễm trùng tiểu":      (p.hist||'').includes('Nhiễm trùng tiểu')?'Có':'Không',
+    "Đái tháo đường":                (p.hist||'').includes('Đái tháo đường')?'Có':'Không',
+    "Tăng huyết áp":                 (p.hist||'').includes('Tăng huyết áp')?'Có':'Không',
+    "Rối loạn chuyển hóa":           (p.hist||'').includes('Rối loạn chuyển hóa')?'Có':'Không',
+    "Tiền sử dùng thuốc":            p.meds,
+    "Tiểu đêm":                      p.ipss?.[6]??'',
+    "Dòng tiểu yếu":                 p.ipss?.[4]??'',
+    "Tiểu khó":                      p.ipss?.[5]??'',
+    "Tiểu nhỏ giọt":                 p.ipss?.[2]??'',
+    "Tiểu gấp":                      p.ipss?.[3]??'',
+    "Tiểu không hết":                p.ipss?.[0]??'',
+    "Rối loạn cương":                p.ed,
+    "Đau vùng chậu/sinh dục":        p.pain,
+    "Điểm IPSS":                     p.ipssTotal,
+    "Nhận thức trước tầm soát":      pv('pg-aware'),
+    "Lý do tham gia":                pv('pg-reason'),
+    "Mức độ e ngại":                 gv('bn-stigma'),
+    "Mức độ thoải mái":              gv('bn-comfort'),
+    "Thể tích tuyến tiền liệt":      gv('d-vol'),
+    "Mật độ PSA":                    gv('d-den'),
+    "Kết quả thăm trực tràng":       pv('pg-dre'),
+    "Có chuyển tuyến không":         pv('pg-ref'),
+    "Chuyên khoa chuyển":            pv('pg-refsp'),
+    "Có sinh thiết không":           pv('pg-bx'),
+    "Kết quả sinh thiết":            pv('pg-bxr'),
+    "Điểm Gleason":                  gv('d-gl'),
+    "Số mẫu dương tính":             gv('d-cores'),
+    "Kết quả hình ảnh":              gv('d-img'),
+    "Nhân sự thực hiện":             S.selStaff ? S.selStaff.code+' — '+S.selStaff.first+' '+S.selStaff.last : '',
   };
 
   if (!endpoint) {
