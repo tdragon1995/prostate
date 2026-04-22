@@ -632,7 +632,11 @@ function renderPt(list) {
       <div class="pt-av">${String(p.no).padStart(3,'0')}</div>
       <div style="flex:1">
         <div class="pt-name">${p.name}</div>
-        <div class="pt-id">${p.dob ? new Date(p.dob).toLocaleDateString('vi-VN') : ''} · ${p.age} tuổi · IPSS: ${p.ipssTotal}/35</div>
+        <div class="pt-id">
+          ${p.dob ? `<strong>NS:</strong> ${p.dob}` : ''}
+          ${p.age ? `<strong>Tuổi:</strong> ${p.age}` : ''}
+          <strong>IPSS:</strong> ${p.ipssTotal}/35
+        </div>
       </div>
       <div class="dot ${p.status==='done'?'dot-d':'dot-p'}"
            title="${p.status==='done'?'Đã hoàn tất':'Chờ bác sĩ'}"></div>`;
@@ -681,7 +685,7 @@ async function completeBS() {
     "STT":                                p.no,
     "Mã Tham Gia":                        p.id,
     "Họ và Tên":                           p.name,
-    "Ngày Sinh":                           p.dob ? new Date(p.dob).toLocaleDateString('vi-VN') : '',
+    "Ngày Sinh":                           p.dob || '',
     "Tuổi":                                p.age,
     "Dân Tộc":                             p.eth,
     "Địa chỉ thường trú":                  p.addr1,
