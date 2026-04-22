@@ -582,6 +582,45 @@ function filterStaff() {
   renderStaff(STAFF.filter(s => (s.code+s.first+s.last+s.role).toLowerCase().includes(q)));
 }
 
+async function fetchAndRenderPatients() {
+  const endpoint = document.getElementById('gs-endpoint').textContent.trim();
+  if (!endpoint) {
+    renderPt(S.patients);
+    return;
+  }
+  try {
+    const url = endpoint + '?action=fetchData';
+    const res = await fetch(url);
+    const json = await res.json();
+    if (json.status === 'ok' && json.rows && json.rows.length > 0) {
+      S.patients = json.rows.map((row, idx) => ({
+        no: row['STT'] || (idx + 1),
+        id: row['Mã Tham Gia'] || '',
+        name: row['Họ và Tên'] || '',
+        dob: row['Ngày Sinh'] || '',
+        age: row['Tuổi'] || '',
+        eth: row['Dân Tộc'] || '',
+        edu: row['Trình độ học vấn'] || '',
+        addr1: row['Địa chỉ thường trú'] || '',
+        addr2: row['Địa chỉ tạm trú'] || '',
+        job: row['Nghề nghiệp'] || '',
+        meds: row['Tiền sử dùng thuốc'] || '',
+        famCA: row['Tiền sử gia đình UTTTL'] || '',
+        famOther: row['Tiền sử gia đình ung thư khác'] || '',
+        hist: row['Tiền sử bản thân'] || '',
+        ipssTotal: row['Điểm IPSS'] || 0,
+        ed: row['Rối loạn cương'] || '',
+        pain: row['Đau vùng chậu/sinh dục'] || '',
+        status: row['Nhân sự thực hiện'] ? 'done' : 'pending',
+      }));
+    }
+    renderPt(S.patients);
+  } catch (err) {
+    console.error('Lỗi khi tải dữ liệu:', err);
+    renderPt(S.patients);
+  }
+}
+
 function renderPt(list) {
   const el = document.getElementById('pt-list');
   el.innerHTML = '';
