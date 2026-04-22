@@ -94,7 +94,7 @@ h1{font-size:18px;font-weight:600;margin-bottom:.25rem}
     <div class="two">
       <div class="field">
         <label>Ngày tháng năm sinh <span style="color:red">*</span></label>
-        <input id="bn-dob" type="text" placeholder="DD/MM/YYYY" onchange="calcAge()" oninput="formatDOB(this)">
+        <input id="bn-dob" type="date" onchange="calcAge()" max="">
       </div>
       <div class="field">
         <label>Tuổi</label>
@@ -432,21 +432,17 @@ function titleCase(input) {
   try { input.setSelectionRange(pos, pos); } catch(e){}
 }
 
-function formatDOB(input) {
-  let val = input.value.replace(/\D/g, '');
-  if (val.length > 8) val = val.slice(0, 8);
-  if (val.length >= 2) val = val.slice(0, 2) + '/' + val.slice(2);
-  if (val.length >= 5) val = val.slice(0, 5) + '/' + val.slice(5);
-  input.value = val;
+function dobToDDMMYYYY(isoDate) {
+  if (!isoDate) return '';
+  const [y, m, d] = isoDate.split('-');
+  return `${d}/${m}/${y}`;
 }
 
 function calcAge() {
-  const dobStr = document.getElementById('bn-dob').value;
+  const dob = document.getElementById('bn-dob').value;
   const ageInput = document.getElementById('bn-age');
-  if (!dobStr || dobStr.length < 10) { ageInput.value = ''; return; }
-  const [day, month, year] = dobStr.split('/').map(Number);
-  if (!day || !month || !year) { ageInput.value = ''; return; }
-  const birth = new Date(year, month - 1, day);
+  if (!dob) { ageInput.value = ''; return; }
+  const birth = new Date(dob);
   const today = new Date();
   let age = today.getFullYear() - birth.getFullYear();
   if (today.getMonth() < birth.getMonth() ||
@@ -543,7 +539,7 @@ async function submitBN() {
   const addr2 = addr2Raw || addr1;
   const ptId = document.getElementById('bn-id').value.trim();
 
-  const dobFormatted = dob; // Keep as DD/MM/YYYY from input
+  const dobFormatted = dobToDDMMYYYY(dob);
 
   const record = {
     "STT": S.runningNumber,
@@ -579,7 +575,7 @@ async function submitBN() {
         no: S.runningNumber,
         id: ptId,
         name,
-        dob,
+        dob: dobFormatted,
         age: parseInt(gv('bn-age')) || '',
         eth,
         edu,
@@ -717,7 +713,7 @@ function selPt(p) {
 
 function renderSum(p) {
   const f = (l,v) => (v!==undefined && v!=='') ? `<div class="sum-lbl">${l}</div><div class="sum-val">${v}</div>` : '';
-  const dobFmt = p.dob ? new Date(p.dob).toLocaleDateString('vi-VN') : '';
+  const dobFmt = p.dob || '';
   document.getElementById('sum-content').innerHTML = `
     <div class="two">${f('Họ và tên',p.name)}${f('Mã bệnh nhân',p.id)}</div>
     <div class="two">${f('Ngày sinh',dobFmt)}${f('Tuổi',p.age ? p.age+' tuổi' : '')}</div>
