@@ -370,6 +370,8 @@ h1{font-size:18px;font-weight:600;margin-bottom:.25rem}
 </div>
 
 <script>
+const GS_ENDPOINT = "https://script.google.com/macros/s/AKfycbxk98m0fF9pccnzFU_NaHhyrhAQ6iK86st4efsBDEfKsjZdnRIS74zVZLXehLqVFjxN/exec";
+
 const S = {
   patients: [],
   selPt: null,
@@ -507,7 +509,7 @@ function goTo(s) {
   }
 }
 
-function submitBN() {
+async function submitBN() {
   const name  = document.getElementById('bn-name').value.trim();
   const dob   = document.getElementById('bn-dob').value;
   const eth   = document.getElementById('bn-eth').value.trim();
@@ -529,31 +531,70 @@ function submitBN() {
 
   const addr2Raw = document.getElementById('bn-addr2').value.trim();
   const addr2 = addr2Raw || addr1;
+  const ptId = document.getElementById('bn-id').value.trim();
 
-  S.patients.unshift({
-    no: S.runningNumber,
-    id: document.getElementById('bn-id').value.trim(),
-    name,
-    dob,
-    age: parseInt(gv('bn-age')) || '',
-    eth,
-    edu,
-    addr1,
-    addr2,
-    job,
-    meds: gv('bn-meds'),
-    famCA:    pv('pg-fam-ca'),
-    famOther: pv('pg-fam-other'),
-    hist:     pv('pg-hist'),
-    ipss:     [],
-    ipssTotal: 0,
-    ed:   '',
-    pain: '',
-    status: 'pending',
-  });
+  const record = {
+    "STT": S.runningNumber,
+    "Mã Lượt Khám": ptId,
+    "Họ và Tên": name,
+    "Ngày Sinh": dob,
+    "Tuổi": parseInt(gv('bn-age')) || '',
+    "Dân Tộc": eth,
+    "Địa chỉ thường trú": addr1,
+    "Địa chỉ tạm trú": addr2,
+    "Trình độ học vấn": edu,
+    "Nghề nghiệp": job,
+    "Tiền sử gia đình UTTTL": pv('pg-fam-ca'),
+    "Tiền sử gia đình ung thư khác": pv('pg-fam-other'),
+    "Tiền sử phì đại tuyến tiền liệt": (pv('pg-hist')||'').includes('Phì đại tuyến tiền liệt')?'Có':'Không',
+    "Tiền sử viêm tuyến tiền liệt": (pv('pg-hist')||'').includes('Viêm tuyến tiền liệt')?'Có':'Không',
+    "Tiền sử nhiễm trùng tiểu": (pv('pg-hist')||'').includes('Nhiễm trùng tiểu')?'Có':'Không',
+    "Đái tháo đường": (pv('pg-hist')||'').includes('Đái tháo đường')?'Có':'Không',
+    "Tăng huyết áp": (pv('pg-hist')||'').includes('Tăng huyết áp')?'Có':'Không',
+    "Rối loạn chuyển hóa": (pv('pg-hist')||'').includes('Rối loạn chuyển hóa')?'Có':'Không',
+    "Tiền sử dùng thuốc": gv('bn-meds'),
+  };
 
-  document.querySelectorAll('.screen').forEach(e => e.classList.remove('active'));
-  document.getElementById('sc-bn-done').classList.add('active');
+  const btn = document.querySelector('#btn-bn-submit');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loading"></span>Đang lưu...';
+
+  try {
+    const res = await fetch(GS_ENDPOINT, { method: 'POST', body: JSON.stringify(record) });
+    const json = await res.json();
+    if (json.status === 'success') {
+      S.patients.unshift({
+        no: S.runningNumber,
+        id: ptId,
+        name,
+        dob,
+        age: parseInt(gv('bn-age')) || '',
+        eth,
+        edu,
+        addr1,
+        addr2,
+        job,
+        meds: gv('bn-meds'),
+        famCA: pv('pg-fam-ca'),
+        famOther: pv('pg-fam-other'),
+        hist: pv('pg-hist'),
+        ipss: [],
+        ipssTotal: 0,
+        ed: '',
+        pain: '',
+        status: 'pending',
+      });
+      document.querySelectorAll('.screen').forEach(e => e.classList.remove('active'));
+      document.getElementById('sc-bn-done').classList.add('active');
+    } else {
+      throw new Error(json.message || 'Lỗi không xác định');
+    }
+  } catch (err) {
+    errEl.style.display = 'block';
+    errEl.textContent = 'Lỗi: ' + err.message;
+    btn.disabled = false;
+    btn.textContent = 'Gửi thông tin của tôi →';
+  }
 }
 
 function renderStaff(list) {
