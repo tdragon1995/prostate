@@ -49,6 +49,9 @@ h1{font-size:18px;font-weight:600;margin-bottom:.25rem}
 .loading{display:inline-block;width:16px;height:16px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px}
 @keyframes spin{to{transform:rotate(360deg)}}
 .staff-sel-badge{display:none;background:#e6f4ea;border-radius:8px;padding:7px 10px;font-size:13px;color:#1e7e34;font-weight:500;margin-top:.5rem}
+.status-badge{display:inline-block;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;white-space:nowrap}
+.status-badge.pending{background:#fff3e0;color:#e65100}
+.status-badge.done{background:#e6f4ea;color:#1e7e34}
 /* IPSS table */
 .ipss-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:.75rem}
 .ipss-table{width:100%;border-collapse:collapse;font-size:12px;min-width:520px}
@@ -638,8 +641,9 @@ function renderPt(list) {
           <strong>IPSS:</strong> ${p.ipssTotal}/35
         </div>
       </div>
-      <div class="dot ${p.status==='done'?'dot-d':'dot-p'}"
-           title="${p.status==='done'?'Đã hoàn tất':'Chờ bác sĩ'}"></div>`;
+      <span class="status-badge ${p.status==='done'?'done':'pending'}">
+        ${p.status==='done'?'✓ Đã hoàn tất':'⧐ Chờ bác sĩ'}
+      </span>`;
     d.onclick = () => selPt(p);
     el.appendChild(d);
   });
