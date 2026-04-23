@@ -438,6 +438,17 @@ function dobToDDMMYYYY(isoDate) {
   return `${d}/${m}/${y}`;
 }
 
+function normalizeDate(val) {
+  if (!val) return '';
+  const s = String(val).trim();
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(s)) return s;
+  const d = new Date(s);
+  if (isNaN(d)) return s;
+  const dd = String(d.getDate()).padStart(2,'0');
+  const mm = String(d.getMonth()+1).padStart(2,'0');
+  return `${dd}/${mm}/${d.getFullYear()}`;
+}
+
 function calcAge() {
   const dob = document.getElementById('bn-dob').value;
   const ageInput = document.getElementById('bn-age');
@@ -645,7 +656,7 @@ async function fetchAndRenderPatients() {
         no: row['STT'] || (idx + 1),
         id: row['Mã Lượt Khám'] || '',
         name: row['Họ và Tên'] || '',
-        dob: row['Ngày Sinh'] || '',
+        dob: normalizeDate(row['Ngày Sinh']),
         age: row['Tuổi'] || '',
         eth: row['Dân Tộc'] || '',
         edu: row['Trình độ học vấn'] || '',
