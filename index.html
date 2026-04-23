@@ -517,6 +517,7 @@ function goTo(s) {
 
 async function submitBN() {
   const name  = document.getElementById('bn-name').value.trim();
+  const ptId  = document.getElementById('bn-id').value.trim();
   const dob   = document.getElementById('bn-dob').value;
   const eth   = document.getElementById('bn-eth').value.trim();
   const edu   = gv('bn-edu');
@@ -525,6 +526,7 @@ async function submitBN() {
   const errEl = document.getElementById('bn-err');
 
   if (!name)  { errEl.style.display='block'; errEl.textContent='Vui lòng nhập họ và tên.'; return; }
+  if (!ptId)  { errEl.style.display='block'; errEl.textContent='Vui lòng nhập Mã lượt khám (mã vạch trên Bill).'; return; }
   if (!dob)   { errEl.style.display='block'; errEl.textContent='Vui lòng chọn ngày tháng năm sinh.'; return; }
   if (!eth)   { errEl.style.display='block'; errEl.textContent='Vui lòng nhập dân tộc.'; return; }
   if (!edu)   { errEl.style.display='block'; errEl.textContent='Vui lòng chọn trình độ học vấn.'; return; }
@@ -534,7 +536,6 @@ async function submitBN() {
 
   const addr2Raw = document.getElementById('bn-addr2').value.trim();
   const addr2 = addr2Raw || addr1;
-  const ptId = document.getElementById('bn-id').value.trim();
 
   const dobFormatted = dobToDDMMYYYY(dob);
 
